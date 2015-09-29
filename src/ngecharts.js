@@ -1,8 +1,9 @@
 /**
  * Created by liekkas.zeng on 2015/1/7.
  */
-angular.module('ng-echarts',['ng-echarts.theme'])
-    .directive('ngEcharts',['theme',function(theme){
+(function (app) {
+    'use strict';
+    app.directive('ngEcharts',function(){
         return {
             controller: ['$scope','$element', function($scope,$element){
                 $scope.chart = echarts.init($element[0]);
@@ -30,58 +31,62 @@ angular.module('ng-echarts',['ng-echarts.theme'])
             link: function(scope,element,attrs,ctrl){
                 var chart = scope.chart;
 
-                function refreshChart(){
-                    if(scope.config && scope.config.dataLoaded === false){
-                        ctrl.showLoading(scope.config.loadingOption);
-                    }
+                if(!scope.setting) return;
 
-                    if(scope.config && scope.config.dataLoaded){
-                        var tn = theme.getTheme(scope.config.theme);
+                function refreshChart(){
+                    console.log('>>> refresh..');
+                    if(angular.isDefined(scope.setting.dataLoaded)){
+                        if(scope.setting.dataLoaded === false){
+                            if(angular.isDefined(scope.setting.loadingOption)){
+                                ctrl.showLoading(scope.setting.loadingOption);
+                            }else{
+                                ctrl.showLoading();
+                            }
+                        }else{
+                            chart.clear();
+                            chart.setOption(scope.setting.option);
+                            chart.resize();
+                            ctrl.hideLoading();
+                        }
+                    }else{
                         chart.clear();
-                        chart.setOption(scope.option);
-                        chart.setTheme(tn||{});
+                        chart.setOption(scope.setting.option);
                         chart.resize();
-                        ctrl.hideLoading();
                     }
                 };
 
                 //事件绑定
-                function bindevent(){
-                    if(angular.isArray(scope.config.event)){
-                        angular.forEach(scope.config.event,function(value,key){
-                            for(var e in value){
-                                chart.on(e,value[e]);
-                            }
-                        });
-                    }
+                function bindevent() {
+                    angular.forEach(scope.setting.event, function (value, key) {
+                        for (var e in value) {
+                            chart.on(e, value[e]);
+                        }
+                    });
                 }
 
-                if(scope.config.event){
+                if(angular.isDefined(scope.setting.event)
+                    && angular.isArray(scope.setting.event)){
                     bindevent();
                 }
 
-                //自定义参数 -
+                // 设置项
                 // event 定义事件
-                // theme 主题
                 // dataLoaded 数据是否加载
-
+                // option 数据项
                 scope.$watch(
-                    function () { return scope.config; },
-                    function (value) {if (value) {refreshChart();}},
+                    'setting',
+                    function (value) {if (value) {
+                        refreshChart();
+                    }},
                     true
                 );
 
-                //图表原生option
-                scope.$watch(
-                    function () { return scope.option; },
-                    function (value) {if (value) {refreshChart();}},
-                    true
-                );
             },
             scope:{
-                option:'=ecOption',
-                config:'=ecConfig'
+                setting: '=setting'
             },
             restrict:'EA'
         }
-    }]);
+    });
+
+})(angular.module('ng-echarts',[]));
