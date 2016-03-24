@@ -180,8 +180,15 @@ angular.module('ng-echarts.theme').factory('macarons', function () {
 
         // 折线图默认参数
         line: {
-            smooth: false,
-            symbol: 'circle',   // 拐点图形类型
+            itemStyle: {
+                normal: {
+                    lineStyle: {
+                        width: 3
+                    }
+                }
+            },
+            smooth: true,
+            symbol: 'emptyCircle',   // 拐点图形类型
             symbolSize: 3       // 拐点图形大小
         },
 
