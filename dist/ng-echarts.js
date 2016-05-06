@@ -7,7 +7,7 @@ angular.module('ng-echarts',[])
             link: function(scope,element,attrs,ctrl){
                 function refreshChart(){
                     var interval = "";
-                    interval = setInterval("initChart",1000);
+                    interval = setInterval(initChart,1000);
                     function initChart(){
                         if(element[0].scrollWidth==0){
                             return;
