@@ -6,29 +6,38 @@ angular.module('ng-echarts',[])
         return {
             link: function(scope,element,attrs,ctrl){
                 function refreshChart(){
-                    var theme = (scope.config && scope.config.theme)
-                        ? scope.config.theme : 'default';
-                    var chart = echarts.init(element[0],theme);
-                    if(scope.config && scope.config.dataLoaded === false){
-                        chart.showLoading();
-                    }
+                    var interval = "";
+                    interval = setInterval("initChart",1000);
+                    function initChart(){
+                        if(element[0].scrollWidth==0){
+                            return;
+                        }else{
+                            clearInterval(interval);
+                        }
+                        var theme = (scope.config && scope.config.theme)
+                            ? scope.config.theme : 'default';
+                        var chart = echarts.init(element[0],theme);
+                        if(scope.config && scope.config.dataLoaded === false){
+                            chart.showLoading();
+                        }
 
-                    if(scope.config && scope.config.dataLoaded){
-                        chart.setOption(scope.option);
-                        chart.resize();
-                        chart.hideLoading();
-                    }
+                        if(scope.config && scope.config.dataLoaded){
+                            chart.setOption(scope.option);
+                            chart.resize();
+                            chart.hideLoading();
+                        }
 
-                    if(scope.config && scope.config.event){
-                        if(angular.isArray(scope.config.event)){
-                            angular.forEach(scope.config.event,function(value,key){
-                                for(var e in value){
-                                    chart.on(e,value[e]);
-                                }
-                            });
+                        if(scope.config && scope.config.event){
+                            if(angular.isArray(scope.config.event)){
+                                angular.forEach(scope.config.event,function(value,key){
+                                    for(var e in value){
+                                        chart.on(e,value[e]);
+                                    }
+                                });
+                            }
                         }
                     }
-                };
+                }
 
                 //自定义参数 - config
                 // event 定义事件
